@@ -52,7 +52,11 @@ class StoreSerializer(serializers.ModelSerializer):
         return Store.objects.create(**data)
 
     def get_menus(self, obj):
-        menus = Menu.objects.filter(store=obj)
+        print(self.context)
+        price = self.context.pop('price')
+        menus = Menu.objects.filter(
+            Q(store=obj) & Q(price__lte=price)
+        )
         data = MenuSerializer(menus, many=True).data
 
         return data

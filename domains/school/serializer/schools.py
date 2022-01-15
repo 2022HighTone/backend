@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from domains.models import School, Store
+from domains.models import Menu, School, Store
 from domains.store.serializer import StoreSerializer
 
 User = get_user_model()
@@ -40,14 +40,16 @@ class SchoolSerializer(serializers.ModelSerializer):
         return School.objects.create(**data)
 
     def get_stores(self, obj):
-        categories = self.context['categories']
-        distance = self.context['distance']
+        categories = self.context.pop('categories')
+        distance = self.context.pop('distance')
         stores = Store.objects.filter(
             Q(school=obj) & Q(category__in=categories) & Q(distance__in=distance)
         )
-        data = StoreSerializer(stores, many=True).data
+        datas = StoreSerializer(stores, many=True, context=self.context).data
 
-        return data
+        new_datas = [data for data in datas if data.get('menus') != []]
+
+        return new_datas
 
 
 def school_list_method(name):

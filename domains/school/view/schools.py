@@ -25,6 +25,7 @@ class DefaultSchoolView(GenericAPIView):
 
         categories = request.GET.get('categories')
         distance = request.GET.get('distance')
+        price = request.GET.get('price')
 
         if categories is not None and categories != '':
             category_list = categories.split(',')
@@ -39,7 +40,8 @@ class DefaultSchoolView(GenericAPIView):
         
         serializer = self.get_serializer(instance, context={
             'categories': categories,
-            'distance': distance
+            'distance': distance,
+            'price': price,
         })
 
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -54,6 +56,7 @@ class ResultSchoolView(GenericAPIView):
         address = request.GET.get('address')
         categories = request.GET.get('categories')
         distance = request.GET.get('distance')
+        price = request.GET.get('price')
 
         if categories is not None and categories != '':
             category_list = categories.split(',')
@@ -73,7 +76,8 @@ class ResultSchoolView(GenericAPIView):
 
         serializer = self.get_serializer(data=data, context={
             'categories': categories,
-            'distance': distance
+            'distance': distance,
+            'price': price,
         })
         serializer.is_valid(raise_exception=True)
 
