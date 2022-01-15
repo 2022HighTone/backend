@@ -42,6 +42,15 @@ class UserManager (BaseUserManager) :
         return user
 
 
+class School(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+    name = models.CharField(max_length=256)
+    address = models.CharField(null=True, blank=True, max_length=512)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+    is_default = models.BooleanField(default=False)
+
+
 class User (AbstractBaseUser, PermissionsMixin) :
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.CharField(max_length=255, unique=True, db_index=True)
@@ -55,6 +64,12 @@ class User (AbstractBaseUser, PermissionsMixin) :
 
     def __str__ (self) :
         return self.email
+
+
+class UserSchool(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    school = models.ForeignKey(School, on_delete=models.CASCADE)
 
 
 class Category(models.Model):
