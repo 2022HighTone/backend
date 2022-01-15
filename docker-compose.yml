@@ -11,6 +11,7 @@ services:
     depends_on: # 서비스 간의 종속성 표현
       - web
   web:  
+    image: highton_web
     build:
       dockerfile : Dockerfile
     command: gunicorn --bind 0.0.0.0:8000 highton.wsgi:application
