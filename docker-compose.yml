@@ -4,10 +4,13 @@ services:
     image: nginx:latest # nginx 서비스에서 사용할 도커 이미지
     ports:
       - "80:80"
+      - "443:443"
     volumes:
       - /usr/src/app
       - ./config/nginx:/etc/nginx/conf.d
       - .static_root/:/staticfiles
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
     depends_on: # 서비스 간의 종속성 표현
       - web
   web:
@@ -19,3 +22,10 @@ services:
       - /usr/src/app
     expose:
       - "8000"
+  certbot:
+    container_name: certbot:latest
+    image: certbot/certbot:v0.36.0
+    restart: always
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
