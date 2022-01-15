@@ -3,6 +3,8 @@ from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
+from domains.models import UserSchool, School
+from domains.school.serializer import SchoolSerializer
 
 User = get_user_model()
 
@@ -53,3 +55,18 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError({'detail': 'wrong password'})
 
         return user
+
+
+class DefaultSchoolSettingSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    address = serializers.CharField()
+
+    def create(self, validated_data):
+        user_id = self.context['request'].user.id
+        user = User.objects.get(id=user_id)
+
+        serializer = SchoolSerializer(data=validated_data)
+        serializer.is_valid(raise_exception=True)
+        school = serializer.save()
+
+        return UserSchool.objects.create(user=user, school=school)
