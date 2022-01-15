@@ -43,7 +43,7 @@ class UserManager (BaseUserManager) :
 
 
 class School(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
     address = models.CharField(null=True, blank=True, max_length=512)
     latitude = models.FloatField(null=True)
@@ -73,12 +73,12 @@ class UserSchool(models.Model):
 
 
 class Category(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
 
 
 class Store(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
     address = models.CharField(null=True, blank=True, max_length=512)
     latitude = models.FloatField(null=True)
