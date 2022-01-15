@@ -6,13 +6,14 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from domains.models import School
-
+from domains.models import School, Store
+from domains.store.serializer import StoreSerializer
 
 User = get_user_model()
 
 
 class SchoolSerializer(serializers.ModelSerializer):
+    stores = serializers.SerializerMethodField()
 
     class Meta:
         model = School
@@ -28,7 +29,7 @@ class SchoolSerializer(serializers.ModelSerializer):
 
         gmaps = googlemaps.Client(key='AIzaSyCYFtPj7vyLQwM2YxY49oYbNavUU57OwcA')
 
-        geocode_result = gmaps.geocode(data['name'])
+        geocode_result = gmaps.geocode(data['address'])
 
         n_lat = geocode_result[0]['geometry']['location']['lat']
         n_lng = geocode_result[0]['geometry']['location']['lng']
@@ -37,6 +38,16 @@ class SchoolSerializer(serializers.ModelSerializer):
         data['longitude'] = n_lng
         
         return School.objects.create(**data)
+
+    def get_stores(self, obj):
+        categories = self.context['categories']
+        distance = self.context['distance']
+        stores = Store.objects.filter(
+            Q(school=obj) & Q(category__in=categories) & Q(distance__in=distance)
+        )
+        data = StoreSerializer(stores, many=True).data
+
+        return data
 
 
 def school_list_method(name):

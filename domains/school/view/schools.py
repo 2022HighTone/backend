@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from domains.school.serializer import (
     SchoolSerializer, school_list_method
 )
-from domains.models import UserSchool, School
+from domains.models import Category, Distance, UserSchool, School
 
 
 class DefaultSchoolView(GenericAPIView):
@@ -22,8 +22,25 @@ class DefaultSchoolView(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         instance = self.get_queryset()
+
+        categories = request.GET.get('categories')
+        distance = request.GET.get('distance')
+
+        if categories is not None and categories != '':
+            category_list = categories.split(',')
+            categories = Category.objects.filter(name__in=category_list)
+        else:
+            categories = Category.objects.all()
+
+        if distance is not None:
+            distance = Distance.objects.filter(name=distance)
+        else:
+            distance=Distance.objects.all()
         
-        serializer = self.get_serializer(instance)
+        serializer = self.get_serializer(instance, context={
+            'categories': categories,
+            'distance': distance
+        })
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -35,13 +52,29 @@ class ResultSchoolView(GenericAPIView):
     def get(self, request, *args, **kwargs):
         name = request.GET.get('name')
         address = request.GET.get('address')
+        categories = request.GET.get('categories')
+        distance = request.GET.get('distance')
+
+        if categories is not None and categories != '':
+            category_list = categories.split(',')
+            categories = Category.objects.filter(name__in=category_list)
+        else:
+            categories = Category.objects.all()
+
+        if distance is not None:
+            distance = Distance.objects.filter(name=distance)
+        else:
+            distance=Distance.objects.all()
 
         data = {
             'name': name,
             'address': address
         }
 
-        serializer = self.get_serializer(data=data)
+        serializer = self.get_serializer(data=data, context={
+            'categories': categories,
+            'distance': distance
+        })
         serializer.is_valid(raise_exception=True)
 
         serializer.save()

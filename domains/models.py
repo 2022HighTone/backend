@@ -3,14 +3,14 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser, PermissionsMixin
 )
 
-class UserManager (BaseUserManager) :
+class UserManager(BaseUserManager):
     
-    def create_user (self, username, email, password=None) :
+    def create_user(self, username, email, password=None):
 
-        if username is None :
+        if username is None:
             raise TypeError('Users should have a username')
 
-        if email is None :
+        if email is None:
             raise TypeError('Users should have a email')
 
         user = self.model(
@@ -23,9 +23,9 @@ class UserManager (BaseUserManager) :
         
         return user
 
-    def create_superuser (self, username, email, password=None) :
+    def create_superuser(self, username, email, password=None):
 
-        if password is None :
+        if password is None:
             raise TypeError('Password should not be none')
 
         user = self.create_user(
@@ -43,7 +43,7 @@ class UserManager (BaseUserManager) :
 
 
 class School(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
     address = models.CharField(null=True, blank=True, max_length=512)
     latitude = models.FloatField(null=True)
@@ -51,7 +51,7 @@ class School(models.Model):
     is_default = models.BooleanField(default=False)
 
 
-class User (AbstractBaseUser, PermissionsMixin) :
+class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.CharField(max_length=255, unique=True, db_index=True)
     is_active = models.BooleanField(default=True)
@@ -62,7 +62,7 @@ class User (AbstractBaseUser, PermissionsMixin) :
 
     objects = UserManager()
 
-    def __str__ (self) :
+    def __str__(self):
         return self.email
 
 
@@ -73,14 +73,28 @@ class UserSchool(models.Model):
 
 
 class Category(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=256)
+
+
+class Distance(models.Model):
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
 
 
 class Store(models.Model):
-    id = models.BigIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=256)
     address = models.CharField(null=True, blank=True, max_length=512)
     latitude = models.FloatField(null=True)
     longitude = models.FloatField(null=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, null=True)
+    distance = models.ForeignKey(Distance, on_delete=models.CASCADE, null=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    
+
+class Menu(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=256)
+    price = models.IntegerField()
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
