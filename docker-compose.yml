@@ -23,7 +23,6 @@ services:
     expose:
       - "8000"
   certbot:
-    container_name: certbot:latest
     image: certbot/certbot:v0.36.0
     restart: always
     volumes:
