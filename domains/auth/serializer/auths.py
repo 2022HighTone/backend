@@ -1,10 +1,12 @@
+from contextlib import nullcontext
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 
-from domains.models import UserSchool, School
+from domains.models import UserSchool, Review
 from domains.school.serializer import SchoolSerializer
+from domains.store.serializer import ReviewSeralizer
 
 User = get_user_model()
 
@@ -70,3 +72,27 @@ class DefaultSchoolSettingSerializer(serializers.Serializer):
         school = serializer.save()
 
         return UserSchool.objects.create(user=user, school=school)
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    school = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'school', 'reviews')
+
+    def get_school(self, obj):
+        user_school = UserSchool.objects.filter(user=obj)
+        if not user_school.exists():
+            return None
+        else:
+            return user_school.first().school.name
+
+
+    def get_reviews(self, obj):
+        reviews = Review.objects.filter(user=obj)
+
+        data = ReviewSeralizer(reviews, many=True).data
+
+        return data

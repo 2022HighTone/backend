@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from domains.auth.serializer import (
     SignUpSerializer, GetTokenSerializer, LoginSerializer,
-    DefaultSchoolSettingSerializer
+    DefaultSchoolSettingSerializer, UserProfileSerializer
 )
 
 
@@ -52,3 +52,14 @@ class DefaultSchoolSettingView(GenericAPIView):
         serializer.save()
 
         return Response({'success': 'default school is set'})
+
+
+class UserProfileView(GenericAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = User.objects.get(id=self.request.user.id)
+        serializer = self.get_serializer(user)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
