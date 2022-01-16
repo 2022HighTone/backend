@@ -78,8 +78,7 @@ class StoreSerializer(serializers.ModelSerializer):
         return Store.objects.create(**data)
 
     def get_menus(self, obj):
-        print(self.context)
-        price = self.context.pop('price')
+        price = self.context.pop('price', None)
         if price is None or price == '':
             menus = Menu.objects.filter(store=obj)
         else:
