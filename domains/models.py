@@ -98,3 +98,13 @@ class Menu(models.Model):
     name = models.CharField(max_length=256)
     price = models.IntegerField()
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+
+
+class Review(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    text = models.CharField(max_length=256)
+    menu = models.ForeignKey(Menu, on_delete=models.CASCADE)
+    rating = models.FloatField()
+    created = models.DateField(auto_created=True, null=True)
