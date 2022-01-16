@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from rest_framework.generics import GenericAPIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -8,13 +9,20 @@ from domains.school.serializer import (
 from domains.models import Category, Distance, UserSchool, School
 
 
+User = get_user_model()
+
+
 class DefaultSchoolView(GenericAPIView):
     serializer_class = SchoolSerializer
     permission_classes = [permissions.AllowAny]
     
     def get_queryset(self):
         if self.request.user.id is not None:
-            school = UserSchool.objects.get(user=self.request.user.id).school
+            user_school = UserSchool.objects.filter(user=self.request.user.id)
+            if user_school.exists():
+                school = user_school.first().school
+            else:
+                school = School.objects.get(is_default=True)
         else:
             school = School.objects.get(is_default=True)
 
