@@ -1,4 +1,3 @@
-from contextlib import nullcontext
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
@@ -88,7 +87,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return None
         else:
             return user_school.first().school.name
-
 
     def get_reviews(self, obj):
         reviews = Review.objects.filter(user=obj)
